@@ -20,12 +20,12 @@ public class ShipController {
 
 	@Autowired
 	private ShipService shipService;
+	private BlockingQueue<HttpServletRequest> queue = new LinkedBlockingDeque<>(3);
 
 	@RequestMapping(value = "/**")
 	public ResponseEntity<?> handleProxyRequest(HttpServletRequest request) {
 		try {
 			logger.info("Receive {} for url {}", request.getMethod(), request.getRequestURL().toString());
-			BlockingQueue<HttpServletRequest> queue = new LinkedBlockingDeque<>(3);
 			queue.put(request);
 			while (true) {
 				return shipService.processRequest(queue.take());
